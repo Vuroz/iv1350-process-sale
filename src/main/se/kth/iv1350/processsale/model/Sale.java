@@ -1,6 +1,7 @@
 package se.kth.iv1350.processsale.model;
 
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
+import se.kth.iv1350.processsale.model.dto.SaleDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,23 +30,13 @@ public class Sale {
      * Adds an item to the current sale
      *
      * @param item the item to add
-     * @return the new running total
+     * @return a copy of the sale after the item has been added
      */
-    public double addItem(ItemDTO item) {
-        System.out.printf("Add %.2f item with item id %s:\n", item.getQuantity(), item.getIdentifier());
-        System.out.printf("Item ID: %s\n", item.getIdentifier());
-        System.out.printf("Item name: %s\n", item.getName());
-        System.out.printf("Item cost: %.2f SEK\n", item.getPrice());
-        System.out.printf("VAT: %.2f%s\n", item.getVat(), "%");
-        System.out.printf("Item description: %s\n", item.getDescription());
-
+    public SaleDTO addItem(ItemDTO item) {
         items.add(item);
         runningTotal += item.getPrice() * item.getQuantity();
 
-        System.out.printf("\nTotal cost (incl VAT): %.2f SEK\n", runningTotal);
-        System.out.printf("Total VAT: %.2f SEK\n\n", calculateTotalVAT());
-
-        return runningTotal;
+        return createDTOFromSale();
     }
 
     /**
@@ -67,6 +58,7 @@ public class Sale {
      * @return total amount paid in VAT
      */
     private double calculateTotalVAT() {
+        totalVAT = 0;
         for (ItemDTO item : items) {
             totalVAT += item.getPrice() * item.getQuantity() * item.getVat() / 100.0;
         }
@@ -74,11 +66,39 @@ public class Sale {
         return totalVAT;
     }
 
+    /**
+     * Creates a DTO from the current sale
+     *
+     * @return the DTO
+     */
+    public SaleDTO createDTOFromSale() {
+        ArrayList<ItemDTO> copyOfItems = deepCopyItems();
+        ItemDTO lastItemAdded = null;
+        if (!copyOfItems.isEmpty()) {
+            lastItemAdded = copyOfItems.get(copyOfItems.size() - 1);
+        }
+
+        return new SaleDTO(LocalDateTime.from(saleTime), copyOfItems, lastItemAdded, runningTotal, calculateTotalVAT());
+    }
+
+    private ArrayList<ItemDTO> deepCopyItems() {
+        ArrayList<ItemDTO> copyOfItems = new ArrayList<>();
+        for (ItemDTO itemDTO : items) {
+            copyOfItems.add(new ItemDTO(itemDTO.getIdentifier(),
+                    itemDTO.getName(),
+                    itemDTO.getDescription(),
+                    itemDTO.getPrice(),
+                    itemDTO.getVat(),
+                    itemDTO.getQuantity()));
+        }
+        return copyOfItems;
+    }
+
     /*
      * Getters
      */
     public ArrayList<ItemDTO> getItems() {
-        return items;
+        return deepCopyItems();
     }
 
     public double getRunningTotal() {

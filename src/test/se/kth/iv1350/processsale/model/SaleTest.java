@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
+import se.kth.iv1350.processsale.model.dto.SaleDTO;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,8 +15,18 @@ class SaleTest {
     @BeforeEach
     void setUp() {
         instanceToTest = new Sale();
-        item1 = new ItemDTO("abc123", "BigWheel Oatmeal", "BigWheel Oatmeal 500g, whole grain oats, high fiber, gluten free", 29.90, 6.0, 1.0);
-        item2 = new ItemDTO("def456", "YouGoGo Blueberry", "YouGoGo Blueberry 240g, low sugar yoghurt, blueberry flavor", 14.90, 6.0, 1);
+        item1 = new ItemDTO("abc123",
+                "BigWheel Oatmeal",
+                "BigWheel Oatmeal 500g, whole grain oats, high fiber, gluten free",
+                29.90,
+                6.0,
+                1.0);
+        item2 = new ItemDTO("def456",
+                "YouGoGo Blueberry",
+                "YouGoGo Blueberry 240g, low sugar yoghurt, blueberry flavor",
+                14.90,
+                6.0,
+                1);
     }
 
     @AfterEach
@@ -27,15 +38,15 @@ class SaleTest {
 
     @Test
     void addItem() {
-        double runningTotal = instanceToTest.addItem(item1);
-        assertEquals(29.90, runningTotal, "Running total after adding abc123 should be 29.90");
+        SaleDTO saleDTO = instanceToTest.addItem(item1);
+        assertEquals(29.90, saleDTO.getRunningTotal(), "Running total after adding abc123 should be 29.90");
         assertEquals(1, instanceToTest.getItems().size(), "Size of items after adding abc123 should be 1");
-        assertEquals(item1, instanceToTest.getItems().get(0), "First item in the list should be abc123");
+        assertEquals(item1.getIdentifier(), instanceToTest.getItems().get(0).getIdentifier(), "First item in the list should be abc123");
 
-        runningTotal = instanceToTest.addItem(item2);
-        assertEquals(44.80, runningTotal, "Running total after adding def456 should be 44.80");
+        saleDTO = instanceToTest.addItem(item2);
+        assertEquals(44.80, saleDTO.getRunningTotal(), "Running total after adding def456 should be 44.80");
         assertEquals(2, instanceToTest.getItems().size(), "Size of items after adding def456 should be 2");
-        assertEquals(item2, instanceToTest.getItems().get(1), "Second item in the list should be def456");
+        assertEquals(item2.getIdentifier(), instanceToTest.getItems().get(1).getIdentifier(), "Second item in the list should be def456");
     }
 
     @Test

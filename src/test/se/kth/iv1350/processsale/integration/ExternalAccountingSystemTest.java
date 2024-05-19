@@ -37,7 +37,7 @@ class ExternalAccountingSystemTest {
     void updateAccountingFromSale() {
         Sale testSale = new Sale();
 
-        instanceToTest.updateAccountingFromSale(testSale);
+        instanceToTest.updateAccountingFromSale(testSale.createDTOFromSale());
         String printout = printoutBuffer.toString();
         String expectedOutput = "Sent sale info to external accounting system.";
 

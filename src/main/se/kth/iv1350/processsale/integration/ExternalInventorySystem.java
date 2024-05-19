@@ -1,7 +1,7 @@
 package se.kth.iv1350.processsale.integration;
 
-import se.kth.iv1350.processsale.model.Sale;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
+import se.kth.iv1350.processsale.model.dto.SaleDTO;
 
 import java.util.HashMap;
 
@@ -19,7 +19,7 @@ public class ExternalInventorySystem {
         itemInformationTable = new HashMap<>();
         itemInformationTable.put("1337", "Milk|1L 3.5% Fat|12.95|12.0");
         itemInformationTable.put("1", "Baked Bread|Freshly baked bread, baked daily in the store, 1kg|49.95|12.0");
-        itemInformationTable.put("3op", "Shampoo|500mL, only natural ingredients, 7in1, anti dandruff|19.95|25.0");
+        itemInformationTable.put("WILL_FAIL", "Fail|Trying to fetch this item will result in an exception|00.00|00.0");
         itemInformationTable.put("42", "Meat|Beef tenderloin, 300grams, superdeal|69.95|12.0");
         itemInformationTable.put("5", "Potato Chips|Kettle-cooked in sunflower oil, 150g|58.99|12.0");
         itemInformationTable.put("abc123", "BigWheel Oatmeal|BigWheel Oatmeal 500g, whole grain oats, high fiber, gluten free|29.90|6.0");
@@ -28,7 +28,7 @@ public class ExternalInventorySystem {
         itemAmountTable = new HashMap<>();
         itemAmountTable.put("1337", 200.0);
         itemAmountTable.put("1", 200.0);
-        itemAmountTable.put("3op", 200.0);
+        itemAmountTable.put("WILL_FAIL", 200.0);
         itemAmountTable.put("42", 200.0);
         itemAmountTable.put("5", 200.0);
         itemAmountTable.put("abc123", 200.0);
@@ -41,8 +41,16 @@ public class ExternalInventorySystem {
      *
      * @param itemIdentifier the identifier to query the information
      * @return information regarding the <code>identifier</code>
+     * @throws NoSuchItemException if the <code>identifier</code> does not exist in the database
+     * @throws InventoryConnectionFailedException if the connection to the external inventory system fails
      */
-    public String getInformation(String itemIdentifier) {
+    public String getInformation(String itemIdentifier) throws NoSuchItemException,InventoryConnectionFailedException {
+        if (!itemInformationTable.containsKey(itemIdentifier)) {
+            throw new NoSuchItemException(itemIdentifier);
+        }
+        if (itemIdentifier.equals("WILL_FAIL")) {
+            throw new InventoryConnectionFailedException("Could not connect to the external inventory system");
+        }
         return itemInformationTable.get(itemIdentifier);
     }
 
@@ -51,7 +59,7 @@ public class ExternalInventorySystem {
      *
      * @param sale the finished sale to use as base when updating
      */
-    public void updateInventoryFromSale(Sale sale) {
+    public void updateInventoryFromSale(SaleDTO sale) {
         HashMap<String, Double> amountInSale = new HashMap<>();
 
         for (ItemDTO item : sale.getItems()) {

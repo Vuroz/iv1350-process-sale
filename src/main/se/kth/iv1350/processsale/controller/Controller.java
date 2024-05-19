@@ -2,8 +2,14 @@ package se.kth.iv1350.processsale.controller;
 
 import se.kth.iv1350.processsale.integration.ExternalAccountingSystem;
 import se.kth.iv1350.processsale.integration.ExternalInventorySystem;
+import se.kth.iv1350.processsale.integration.InventoryConnectionFailedException;
+import se.kth.iv1350.processsale.integration.NoSuchItemException;
+import se.kth.iv1350.processsale.model.RevenueObserver;
 import se.kth.iv1350.processsale.model.Sale;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
+import se.kth.iv1350.processsale.model.dto.SaleDTO;
+
+import java.util.ArrayList;
 
 /**
  * This is the application's only controller. All calls to the model pass through here.
@@ -12,6 +18,9 @@ public class Controller {
     private Sale sale;
     private ExternalAccountingSystem externalAccountingSystem;
     private ExternalInventorySystem externalInventorySystem;
+    private ArrayList<RevenueObserver> revenueObservers;
+
+    private static double totalRevenue = 0.0;
 
     /**
      * Creates a new instance of this class, which also initializes the external systems.
@@ -19,6 +28,7 @@ public class Controller {
     public Controller() {
         externalInventorySystem = new ExternalInventorySystem();
         externalAccountingSystem = new ExternalAccountingSystem();
+        revenueObservers = new ArrayList<>();
     }
 
     /**
@@ -33,12 +43,18 @@ public class Controller {
      *
      * @param itemIdentifier the identifier of the item to add to sale
      * @param quantity quantity of the item to add
-     * @return the running total after the item has been added
+     * @return a copy of the current sale after the item has been added
+     * @throws NoSuchItemException if the item does not exist in the inventory
+     * @throws OperationFailedException if the operation failed
      */
-    public double addItemToSale(String itemIdentifier, double quantity) {
-        String itemInformation = externalInventorySystem.getInformation(itemIdentifier);
-        ItemDTO item = parseItemInformation(itemIdentifier, itemInformation, quantity);
-        return sale.addItem(item);
+    public SaleDTO addItemToSale(String itemIdentifier, double quantity) throws NoSuchItemException, OperationFailedException {
+        try {
+            String itemInformation = externalInventorySystem.getInformation(itemIdentifier);
+            ItemDTO item = parseItemInformation(itemIdentifier, itemInformation, quantity);
+            return sale.addItem(item);
+        } catch (InventoryConnectionFailedException e) {
+            throw new OperationFailedException("Could not connect to the external inventory system, try again");
+        }
     }
 
     /**
@@ -59,6 +75,15 @@ public class Controller {
     }
 
     /**
+     * Adds a revenue observer to the list of revenue observers
+     *
+     * @param revenueObserver the revenue observer to add
+     */
+    public void addRevenueObserver(RevenueObserver revenueObserver) {
+        revenueObservers.add(revenueObserver);
+    }
+
+    /**
      * Ends the current sale
      *
      * @return the total amount due
@@ -74,13 +99,15 @@ public class Controller {
      * @return the change to give back
      */
     public double pay(double cashTotal) {
-        System.out.printf("Customer pays %.2f SEK:\n", cashTotal);
-        externalAccountingSystem.updateAccountingFromSale(sale);
-        externalInventorySystem.updateInventoryFromSale(sale);
+        externalAccountingSystem.updateAccountingFromSale(sale.createDTOFromSale());
+        externalInventorySystem.updateInventoryFromSale(sale.createDTOFromSale());
 
         sale.getReceipt().printReceipt(cashTotal);
+        totalRevenue += sale.getRunningTotal();
 
-        System.out.printf("\nChange to give to the customer: %2.2f SEK", cashTotal - sale.getRunningTotal());
+        for (RevenueObserver revenueObserver : revenueObservers) {
+            revenueObserver.update(totalRevenue);
+        }
 
         return cashTotal - sale.getRunningTotal();
     }

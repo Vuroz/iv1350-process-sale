@@ -62,7 +62,7 @@ public class Receipt {
      * @param items list of {@link ItemDTO} to collect.
      * @return {@link HashMap} with the identifiers as keys and {@link ReceiptItem} as values
      */
-    HashMap<String, ReceiptItem> collectItemDTOToReceiptItem(ArrayList<ItemDTO> items) { // PACKAGE PRIVATE SO TESTS ARE POSSIBLE
+    HashMap<String, ReceiptItem> collectItemDTOToReceiptItem(ArrayList<ItemDTO> items) {
         HashMap<String, ReceiptItem> receiptItems = new HashMap<>();
 
         for (ItemDTO item : items) {
