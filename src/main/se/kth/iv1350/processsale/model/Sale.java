@@ -1,5 +1,6 @@
 package se.kth.iv1350.processsale.model;
 
+import se.kth.iv1350.processsale.model.dto.DiscountDTO;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
 import se.kth.iv1350.processsale.model.dto.SaleDTO;
 
@@ -14,16 +15,21 @@ public class Sale {
     private LocalDateTime saleTime;
     private ArrayList<ItemDTO> items;
     private double runningTotal, totalVAT;
+    private DiscountDTO discount;
     private Receipt receipt;
+    private ArrayList<RevenueObserver> revenueObservers;
+    private static double totalRevenue = 0.0;
 
     /**
      * The constructor, called when creating a new instance of this class.
      */
     public Sale() {
         items = new ArrayList<>();
+        revenueObservers = new ArrayList<>();
         runningTotal = 0.0;
         totalVAT = 0.0;
         saleTime = LocalDateTime.now();
+        discount = new DiscountDTO(0.0, 0.0, 0.0);
     }
 
     /**
@@ -47,7 +53,9 @@ public class Sale {
     public double endSale() {
         totalVAT = calculateTotalVAT();
 
-        receipt = new Receipt(items, runningTotal, totalVAT, saleTime);
+        receipt = new Receipt(items, runningTotal, totalVAT, saleTime, discount);
+
+        notifyObservers();
 
         return runningTotal;
     }
@@ -81,6 +89,11 @@ public class Sale {
         return new SaleDTO(LocalDateTime.from(saleTime), copyOfItems, lastItemAdded, runningTotal, calculateTotalVAT());
     }
 
+    /**
+     * Deep copies the current list of Items
+     * 
+     * @return A <code>ArrayList</code> of {@link ItemDTO}s
+     */
     private ArrayList<ItemDTO> deepCopyItems() {
         ArrayList<ItemDTO> copyOfItems = new ArrayList<>();
         for (ItemDTO itemDTO : items) {
@@ -92,6 +105,34 @@ public class Sale {
                     itemDTO.getQuantity()));
         }
         return copyOfItems;
+    }
+
+    /**
+     * Adds a revenue observer to the list
+     * 
+     * @param observer The observer to add
+     */
+    public void addObserver(RevenueObserver observer) {
+        this.revenueObservers.add(observer);
+    }
+
+    /**
+     * Applies a discount to the sale
+     * 
+     * @param discountDTO The discount to apply
+     */
+    public void applyDiscount(DiscountDTO discountDTO) {
+        this.discount = discountDTO;
+    }
+
+    /**
+     * Notifies observers of a revenue change
+     */
+    private void notifyObservers() {
+        totalRevenue += (((this.getRunningTotal() * (1 - discount.getPercentage())) - discount.getRaw()) * (1 - discount.getPersonalPercentage()));
+        for (RevenueObserver revenueObserver : revenueObservers) {
+            revenueObserver.update(totalRevenue);
+        }
     }
 
     /*

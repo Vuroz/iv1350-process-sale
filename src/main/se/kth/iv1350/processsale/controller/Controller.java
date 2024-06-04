@@ -1,11 +1,9 @@
 package se.kth.iv1350.processsale.controller;
 
-import se.kth.iv1350.processsale.integration.ExternalAccountingSystem;
-import se.kth.iv1350.processsale.integration.ExternalInventorySystem;
-import se.kth.iv1350.processsale.integration.InventoryConnectionFailedException;
-import se.kth.iv1350.processsale.integration.NoSuchItemException;
+import se.kth.iv1350.processsale.integration.*;
 import se.kth.iv1350.processsale.model.RevenueObserver;
 import se.kth.iv1350.processsale.model.Sale;
+import se.kth.iv1350.processsale.model.dto.DiscountDTO;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
 import se.kth.iv1350.processsale.model.dto.SaleDTO;
 
@@ -18,9 +16,10 @@ public class Controller {
     private Sale sale;
     private ExternalAccountingSystem externalAccountingSystem;
     private ExternalInventorySystem externalInventorySystem;
+    private DiscountDatabase discountDatabase;
     private ArrayList<RevenueObserver> revenueObservers;
 
-    private static double totalRevenue = 0.0;
+
 
     /**
      * Creates a new instance of this class, which also initializes the external systems.
@@ -28,6 +27,7 @@ public class Controller {
     public Controller() {
         externalInventorySystem = new ExternalInventorySystem();
         externalAccountingSystem = new ExternalAccountingSystem();
+        discountDatabase = new DiscountDatabase();
         revenueObservers = new ArrayList<>();
     }
 
@@ -36,6 +36,9 @@ public class Controller {
      */
     public void startNewSale() {
         sale = new Sale();
+        for (RevenueObserver revenueObserver : revenueObservers) {
+            sale.addObserver(revenueObserver);
+        }
     }
 
     /**
@@ -57,6 +60,7 @@ public class Controller {
         }
     }
 
+
     /**
      * Creates a new {@link ItemDTO} from the specifier <code>itemInformation</code>
      *
@@ -72,6 +76,16 @@ public class Controller {
         double price = Double.parseDouble(itemInformationEntries[2]);
         double vatPercentage = Double.parseDouble(itemInformationEntries[3]);
         return new ItemDTO(itemIdentifier, name, description, price, vatPercentage, quantity);
+    }
+
+    /**
+     * Applies a discount to the sale
+     * 
+     * @param customerID the ID of the customer
+     */
+    public void applyDiscountToSale(String customerID) {
+        DiscountDTO discountDTO = discountDatabase.getDiscount(sale.getItems(), sale.getRunningTotal(), customerID);
+        sale.applyDiscount(discountDTO);
     }
 
     /**
@@ -103,11 +117,6 @@ public class Controller {
         externalInventorySystem.updateInventoryFromSale(sale.createDTOFromSale());
 
         sale.getReceipt().printReceipt(cashTotal);
-        totalRevenue += sale.getRunningTotal();
-
-        for (RevenueObserver revenueObserver : revenueObservers) {
-            revenueObserver.update(totalRevenue);
-        }
 
         return cashTotal - sale.getRunningTotal();
     }

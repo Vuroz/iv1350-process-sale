@@ -25,12 +25,10 @@ public class View {
     /**
      * Prints an error message to the user.
      * 
-     * @param prefix The prefix to the error message
-     * @param exception The exception that caused the error
+     * @param message The message to the user
      */
-    private void showErrorToUser(String prefix, Exception exception) {
-        System.out.print(prefix);
-        System.out.println(exception.getMessage());
+    private void showErrorToUser(String message) {
+        System.out.print(message);
         System.out.println();
     }
 
@@ -52,9 +50,9 @@ public class View {
             System.out.printf("\nTotal cost (incl VAT): %.2f SEK\n", saleDTO.getRunningTotal());
             System.out.printf("Total VAT: %.2f SEK\n\n", saleDTO.getTotalVat());
         } catch (NoSuchItemException noSuchItemException) {
-            showErrorToUser("Item could not be added to sale: ", noSuchItemException);
+            showErrorToUser(String.format("Item could not be added to sale: Item with ID: %s, could not be found", identifier));
         } catch (Exception exception) {
-            showErrorToUser("Item could not be added to sale: ", exception);
+            showErrorToUser("Item could not be added to sale, please try again");
             logHandler.logException(exception);
         }
     }
@@ -68,8 +66,10 @@ public class View {
         simulateAddItemToSale("abc123", 1.0);
         simulateAddItemToSale("WILL_FAIL", 2.0);
         simulateAddItemToSale("def456", 1.0);
-        simulateAddItemToSale("abc123", 2.0);
+        simulateAddItemToSale("abc123", 7.0);
         simulateAddItemToSale("asdasd", 2.0);
+
+        controller.applyDiscountToSale("1");
 
         controller.endSale();
 

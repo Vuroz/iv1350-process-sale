@@ -6,11 +6,13 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.logging.Logger;
 
 /**
  * Represents a log handler that logs exceptions to a file.
  */
 public class LogHandler {
+    private static LogHandler LOG_HANDLER;
     private static final String LOG_FILE_NAME = "process-sale-log.txt";
     private PrintWriter logFile;
 
@@ -19,8 +21,20 @@ public class LogHandler {
      *
      * @throws IOException if the log file cannot be created
      */
-    public LogHandler() throws IOException {
+    private LogHandler() throws IOException {
         logFile = new PrintWriter(new FileWriter(LOG_FILE_NAME), true);
+    }
+
+    /**
+     * Gets the only instance of this class
+     * @return instance of this log handler
+     * @throws IOException if the log file cannot be created.
+     */
+    public static LogHandler getInstance() throws IOException {
+        if (LOG_HANDLER == null) {
+            LOG_HANDLER = new LogHandler();
+        }
+        return LOG_HANDLER;
     }
 
     /**

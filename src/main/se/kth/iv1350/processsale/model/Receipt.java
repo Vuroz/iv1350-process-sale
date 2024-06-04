@@ -1,5 +1,6 @@
 package se.kth.iv1350.processsale.model;
 
+import se.kth.iv1350.processsale.model.dto.DiscountDTO;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class Receipt {
     private final double runningTotal;
     private final double totalVAT;
     private final LocalDateTime saleTime;
+    private final DiscountDTO discountDTO;
 
     /**
      * Constructor, Creates the receipt based on items, the running total, and the total amount in VAT
@@ -25,11 +27,12 @@ public class Receipt {
      * @param totalVAT The total amount paid in VAT
      * @param saleTime The time of the sale
      */
-    public Receipt(ArrayList<ItemDTO> items, double total, double totalVAT, LocalDateTime saleTime) {
+    public Receipt(ArrayList<ItemDTO> items, double total, double totalVAT, LocalDateTime saleTime, DiscountDTO discountDTO) {
         this.items = items;
         this.runningTotal = total;
         this.totalVAT = totalVAT;
         this.saleTime = saleTime;
+        this.discountDTO = discountDTO;
     }
 
     /**
@@ -47,11 +50,14 @@ public class Receipt {
             System.out.printf("%-20s %2.2f x %3.2f %13.2f SEK\n", receiptItem.getName(), receiptItem.getQuantity(), receiptItem.getPrice(), receiptItem.getQuantity() * receiptItem.getPrice());
         }
 
-        System.out.printf("\nTotal:%41.2f SEK\n", runningTotal);
+        System.out.printf("\nPercentage discount (applied first): %10.2f%%\n", discountDTO.getPercentage() * 100);
+        System.out.printf("Numerical discount (applied second): %10.2f SEK\n", discountDTO.getRaw());
+        System.out.printf("Personal discount (applied last): %13.2f%%\n", discountDTO.getPersonalPercentage() * 100);
+        System.out.printf("Total:%41.2f SEK\n", ((runningTotal * (1 - discountDTO.getPercentage())) - discountDTO.getRaw()) * (1 - discountDTO.getPersonalPercentage()));
         System.out.printf("VAT: %-30.2f\n", totalVAT);
 
         System.out.printf("\nCash:  %40.2f SEK\n", cashAmount);
-        System.out.printf("Change:%40.2f SEK\n", cashAmount - runningTotal);
+        System.out.printf("Change:%40.2f SEK\n", cashAmount - (((runningTotal * (1 - discountDTO.getPercentage())) - discountDTO.getRaw()) * (1 - discountDTO.getPersonalPercentage())));
         System.out.println("------------------- End receipt -------------------");
     }
 

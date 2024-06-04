@@ -1,18 +1,6 @@
-2024-maj-18 23:44:45> The following exception was thrown: Could not connect to the external inventory system, try again
+2024-jun-04 16:09:20> The following exception was thrown: Could not connect to the external inventory system, try again
 se.kth.iv1350.processsale.controller.OperationFailedException: Could not connect to the external inventory system, try again
-	at se.kth.iv1350.processsale.controller.Controller.addItemToSale(Controller.java:56)
-	at se.kth.iv1350.processsale.view.View.simulateAddItemToSale(View.java:39)
-	at se.kth.iv1350.processsale.view.View.simulateSale(View.java:63)
+	at se.kth.iv1350.processsale.controller.Controller.addItemToSale(Controller.java:59)
+	at se.kth.iv1350.processsale.view.View.simulateAddItemToSale(View.java:43)
+	at se.kth.iv1350.processsale.view.View.simulateSale(View.java:67)
 	at se.kth.iv1350.processsale.startup.ProcessSale.main(ProcessSale.java:42)
-2024-maj-18 23:44:45> The following exception was thrown: Could not connect to the external inventory system, try again
-se.kth.iv1350.processsale.controller.OperationFailedException: Could not connect to the external inventory system, try again
-	at se.kth.iv1350.processsale.controller.Controller.addItemToSale(Controller.java:56)
-	at se.kth.iv1350.processsale.view.View.simulateAddItemToSale(View.java:39)
-	at se.kth.iv1350.processsale.view.View.simulateSale(View.java:63)
-	at se.kth.iv1350.processsale.startup.ProcessSale.main(ProcessSale.java:43)
-2024-maj-18 23:44:45> The following exception was thrown: Could not connect to the external inventory system, try again
-se.kth.iv1350.processsale.controller.OperationFailedException: Could not connect to the external inventory system, try again
-	at se.kth.iv1350.processsale.controller.Controller.addItemToSale(Controller.java:56)
-	at se.kth.iv1350.processsale.view.View.simulateAddItemToSale(View.java:39)
-	at se.kth.iv1350.processsale.view.View.simulateSale(View.java:63)
-	at se.kth.iv1350.processsale.startup.ProcessSale.main(ProcessSale.java:44)

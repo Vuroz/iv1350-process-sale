@@ -3,6 +3,7 @@ package se.kth.iv1350.processsale.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import se.kth.iv1350.processsale.model.dto.DiscountDTO;
 import se.kth.iv1350.processsale.model.dto.ItemDTO;
 
 import java.time.LocalDateTime;
@@ -14,13 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReceiptTest {
     private Receipt instanceToTest;
     private ArrayList<ItemDTO> items;
+    private DiscountDTO discountDTO;
 
     @BeforeEach
     void setUp() {
         items = new ArrayList<>();
         items.add(new ItemDTO("abc123", "BigWheel Oatmeal", "BigWheel Oatmeal 500g, whole grain oats, high fiber, gluten free", 29.90, 6.0, 1.0));
         items.add(new ItemDTO("def456", "YouGoGo Blueberry", "YouGoGo Blueberry 240g, low sugar yoghurt, blueberry flavor", 14.90, 6.0, 1));
-        instanceToTest = new Receipt(items, 500.0, 125.0, LocalDateTime.now());
+        discountDTO = new DiscountDTO(10.0, 5.0, 15.0);
+        instanceToTest = new Receipt(items, 500.0, 125.0, LocalDateTime.now(), discountDTO);
     }
 
     @AfterEach

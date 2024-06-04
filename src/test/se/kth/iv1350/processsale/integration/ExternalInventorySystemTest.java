@@ -49,13 +49,15 @@ class ExternalInventorySystemTest {
             instanceToTest.getInformation("A invalid item ID");
         }, "Inventory returned information about an item which does not exist");
 
-        assertEquals("Item with ID: A invalid item ID, could not be found", invalidItemException.getMessage(), "Exception message was not correct");
+        assertEquals("Item with ID: A invalid item ID, could not be found", invalidItemException.getMessage(),
+                "Exception message was not correct");
 
         InventoryConnectionFailedException noConnectionException = assertThrows(InventoryConnectionFailedException.class, () -> {
             instanceToTest.getInformation("WILL_FAIL");
         }, "Inventory returned information when it should have created an exception");
 
-        assertEquals("Could not connect to the external inventory system", noConnectionException.getMessage(), "Exception message was not correct");
+        assertEquals("Could not connect to the external inventory system", noConnectionException.getMessage(),
+                "Exception message was not correct");
     }
 
     @Test

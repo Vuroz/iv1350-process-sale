@@ -33,14 +33,12 @@ public class ProcessSale {
         controller.addRevenueObserver(revenueFileOutputObserver);
         LogHandler logHandler = null;
         try {
-            logHandler = new LogHandler();
+            logHandler = LogHandler.getInstance();
         } catch (IOException e) {
             System.out.println("Could not create log file, exiting...");
             System.exit(1);
         }
         View view = new View(controller, logHandler);
-        view.simulateSale();
-        view.simulateSale();
         view.simulateSale();
     }
 }
