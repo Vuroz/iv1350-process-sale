@@ -12,12 +12,14 @@ import java.util.ArrayList;
 public class DiscountDatabase {
     private ArrayList<DiscountMatcher> discountMatchers;
 
+    /**
+     * Creates a new instance of the discount database.
+     */
     public DiscountDatabase() {
         discountMatchers = new ArrayList<>();
         discountMatchers.add(new DiscountPercentageMatcher());
         discountMatchers.add(new DiscountRawMatcher());
         discountMatchers.add(new DiscountPersonalPercentageMatcher());
-
     }
 
     /**

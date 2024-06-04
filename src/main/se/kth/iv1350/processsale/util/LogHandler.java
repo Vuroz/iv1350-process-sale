@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.logging.Logger;
 
 /**
  * Represents a log handler that logs exceptions to a file.

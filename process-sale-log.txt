@@ -1,4 +1,4 @@
-2024-jun-04 16:09:20> The following exception was thrown: Could not connect to the external inventory system, try again
+2024-jun-04 16:36:14> The following exception was thrown: Could not connect to the external inventory system, try again
 se.kth.iv1350.processsale.controller.OperationFailedException: Could not connect to the external inventory system, try again
 	at se.kth.iv1350.processsale.controller.Controller.addItemToSale(Controller.java:59)
 	at se.kth.iv1350.processsale.view.View.simulateAddItemToSale(View.java:43)

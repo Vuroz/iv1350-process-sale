@@ -9,7 +9,12 @@ import java.util.ArrayList;
  */
 public class DiscountPercentageMatcher implements DiscountMatcher {
     /**
-     * Returns a discount based on the running total.
+     * This method is used to get a discount that may be applied to the sale
+     * 
+     * @param itemsInSale The items that are in the sale
+     * @param runningTotal The running total of the sale
+     * @param customerID The customer ID of the customer
+     * @return The resulting {@link DiscountResultDTO} that may be applied to the sale
      */
     @Override
     public DiscountResultDTO getDiscount(ArrayList<ItemDTO> itemsInSale, double runningTotal, String customerID) {
